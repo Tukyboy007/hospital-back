@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -14,15 +14,23 @@ impl Default for Role {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct User {
+#[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
+pub struct DoctorUserRow {
     pub id: Uuid,
-    pub email: String,
-    #[serde(skip_serializing)]
-    pub password_hash: String,
-    pub name: String,
-    pub role: Role,
+    pub reg_no: String,                // NOT NULL
+    pub first_name: Option<String>,    // NULL байж болно
+    pub last_name: Option<String>,     // NULL байж болно
+    pub rank_name: Option<String>,     // NULL байж болно
+    pub org_name: Option<String>,      // NULL байж болно
+    pub org_id: Option<Uuid>,          // NULL байж болно
+    pub position: Option<String>,      // NULL байж болно
+    pub birth_date: Option<NaiveDate>, // NULL байж болно
+    pub gender: Option<String>,        // NULL байж болно
+    pub password_hash: String,         // NOT NULL
+    pub doctor_roll: Option<i32>,      // FK, NULL байж болно
     pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    pub is_active: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

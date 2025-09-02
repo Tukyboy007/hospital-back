@@ -1,5 +1,5 @@
-use chrono::{DateTime, Utc};
-use serde::Serialize;
+use chrono::{DateTime, NaiveDate, Utc};
+use serde::{Deserialize, Serialize};
 use sqlx::{PgPool, postgres::PgPoolOptions};
 use uuid::Uuid;
 
@@ -29,16 +29,24 @@ pub async fn migrate(db: &Db) -> Result<(), DbError> {
 }
 
 // ==== Models mirrored locally for convenience (could use `common`) ====
-#[derive(sqlx::FromRow, Debug, Clone, Serialize)]
-pub struct UserRow {
+#[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
+pub struct DoctorUserRow {
     pub id: Uuid,
-    pub email: String,
-    pub password_hash: String,
-    pub name: String,
-    pub role: String,
+    pub reg_no: String,                // NOT NULL
+    pub first_name: Option<String>,    // NULL байж болно
+    pub last_name: Option<String>,     // NULL байж болно
+    pub rank_name: Option<String>,     // NULL байж болно
+    pub org_name: Option<String>,      // NULL байж болно
+    pub org_id: Option<Uuid>,          // NULL байж болно
+    pub position: Option<String>,      // NULL байж болно
+    pub birth_date: Option<NaiveDate>, // NULL байж болно
+    pub gender: Option<String>,        // NULL байж болно
+    pub password_hash: String,         // NOT NULL
+    pub doctor_roll: Option<i32>,      // FK, NULL байж болно
     pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    pub is_active: bool,
 }
-
 #[derive(sqlx::FromRow, Debug, Clone, Serialize)]
 pub struct ItemRow {
     pub id: Uuid,
@@ -49,45 +57,82 @@ pub struct ItemRow {
     pub updated_at: DateTime<Utc>,
 }
 
-// ==== Users ====
-pub async fn find_user_by_email(db: &Db, email: &str) -> Result<Option<UserRow>, DbError> {
-    let row = sqlx::query_as::<_, UserRow>(
-        "SELECT id,email,password_hash,name,role,created_at FROM users WHERE email = $1",
-    )
-    .bind(email)
-    .fetch_optional(&db.0)
-    .await?;
-    Ok(row)
-}
-
-pub async fn find_user_by_id(db: &Db, id: Uuid) -> Result<Option<UserRow>, DbError> {
-    let row = sqlx::query_as::<_, UserRow>(
-        "SELECT id,email,password_hash,name,role,created_at FROM users WHERE id = $1",
-    )
-    .bind(id)
-    .fetch_optional(&db.0)
-    .await?;
-    Ok(row)
-}
-
-pub async fn insert_user(
+pub async fn insert_doctor_user(
     db: &Db,
-    email: &str,
-    name: &str,
+    reg_no: &str,
+    first_name: &str,
+    last_name: &str,
     password_hash: &str,
-    role: &str,
-) -> Result<UserRow, DbError> {
-    let row = sqlx::query_as::<_, UserRow>(
-        r#"INSERT INTO users (email,name,password_hash,role)
-            VALUES ($1,$2,$3,$4)
-            RETURNING id,email,password_hash,name,role,created_at"#,
+    rank_name: Option<&str>,
+    org_name: Option<&str>,
+    org_id: Option<Uuid>,
+    position: Option<&str>,
+    birth_date: Option<NaiveDate>,
+    gender: Option<&str>,
+    doctor_roll: Option<i32>,
+) -> Result<DoctorUserRow, DbError> {
+    let row = sqlx::query_as!(
+        DoctorUserRow,
+        r#"
+        INSERT INTO doctor_user (
+            reg_no, first_name, last_name, password_hash,
+            rank_name, org_name, org_id, position, birth_date, gender, doctor_roll
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        RETURNING 
+            id, reg_no, first_name, last_name, password_hash,
+            rank_name, org_name, org_id, position, birth_date, gender, doctor_roll,
+            created_at, updated_at, is_active
+        "#,
+        reg_no,
+        first_name,
+        last_name,
+        password_hash,
+        rank_name,
+        org_name,
+        org_id,
+        position,
+        birth_date,
+        gender,
+        doctor_roll
     )
-    .bind(email)
-    .bind(name)
-    .bind(password_hash)
-    .bind(role)
     .fetch_one(&db.0)
     .await?;
+
+    Ok(row)
+}
+
+pub async fn find_doctor_by_reg_no(
+    db: &Db,
+    reg_no: &str,
+) -> Result<Option<DoctorUserRow>, DbError> {
+    let row = sqlx::query_as!(
+        DoctorUserRow,
+        r#"
+        SELECT 
+            id,
+            reg_no,
+            first_name,
+            last_name,
+            rank_name,
+            org_name,
+            org_id,
+            position,
+            birth_date,
+            gender,
+            doctor_roll,
+            password_hash,
+            created_at,
+            updated_at,
+            is_active
+        FROM doctor_user
+        WHERE reg_no = $1
+        "#,
+        reg_no
+    )
+    .fetch_optional(&db.0)
+    .await?;
+
     Ok(row)
 }
 
