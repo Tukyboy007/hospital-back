@@ -1,0 +1,106 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT \n            id,\n            reg_no,\n            first_name,\n            last_name,\n            rank_name,\n            org_name,\n            org_id,\n            position,\n            birth_date,\n            gender,\n            doctor_roll,\n            password_hash,\n            created_at,\n            updated_at,\n            is_active\n        FROM doctor_user\n        WHERE reg_no = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "reg_no",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "first_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "last_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "rank_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "org_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "org_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 7,
+        "name": "position",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "birth_date",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 9,
+        "name": "gender",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "doctor_roll",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 11,
+        "name": "password_hash",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 12,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 13,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 14,
+        "name": "is_active",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "bde337b9895eea8f1c9b547dc0a65b11f50331c11f4f3dd6adb9fa0a58fff783"
+}
