@@ -57,7 +57,7 @@ pub async fn update(
     body: web::Json<ItemIn>,
     req: actix_web::HttpRequest,
 ) -> actix_web::Result<HttpResponse> {
-    crate::extractors::require_role(&req, "User")?; // any logged-in user (or Admin)
+    crate::extractors::require_role(&req, 1)?; // any logged-in user (or Admin)
     let id = path.into_inner();
     if let Some(row) = update_item(&data, id, &body.title, body.description.as_deref())
         .await
@@ -75,7 +75,7 @@ pub async fn remove(
     path: web::Path<Uuid>,
     req: HttpRequest,
 ) -> actix_web::Result<HttpResponse> {
-    require_role(&req, "Admin")?; // only admin can delete
+    require_role(&req, 1)?; // only admin can delete
     let id = path.into_inner();
     let affected = delete_item(&data, id)
         .await

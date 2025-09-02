@@ -17,22 +17,22 @@ impl Default for Role {
 #[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
 pub struct DoctorUserRow {
     pub id: Uuid,
+    pub doctor_id: i64,                // NOT NULL
     pub reg_no: String,                // NOT NULL
     pub first_name: Option<String>,    // NULL байж болно
     pub last_name: Option<String>,     // NULL байж болно
     pub rank_name: Option<String>,     // NULL байж болно
     pub org_name: Option<String>,      // NULL байж болно
-    pub org_id: Option<Uuid>,          // NULL байж болно
+    pub org_id: i32,                   // NOT NULL
     pub position: Option<String>,      // NULL байж болно
     pub birth_date: Option<NaiveDate>, // NULL байж болно
     pub gender: Option<String>,        // NULL байж болно
     pub password_hash: String,         // NOT NULL
-    pub doctor_roll: Option<i32>,      // FK, NULL байж болно
+    pub doctor_roll: i32,              // FK, NULL байж болно
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub is_active: bool,
 }
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Item {
     pub id: Uuid,

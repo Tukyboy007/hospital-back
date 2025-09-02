@@ -32,17 +32,18 @@ pub async fn migrate(db: &Db) -> Result<(), DbError> {
 #[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
 pub struct DoctorUserRow {
     pub id: Uuid,
+    pub doctor_id: i64,                // NOT NULL
     pub reg_no: String,                // NOT NULL
     pub first_name: Option<String>,    // NULL байж болно
     pub last_name: Option<String>,     // NULL байж болно
     pub rank_name: Option<String>,     // NULL байж болно
     pub org_name: Option<String>,      // NULL байж болно
-    pub org_id: Option<Uuid>,          // NULL байж болно
+    pub org_id: i32,                   // NOT NULL
     pub position: Option<String>,      // NULL байж болно
     pub birth_date: Option<NaiveDate>, // NULL байж болно
     pub gender: Option<String>,        // NULL байж болно
     pub password_hash: String,         // NOT NULL
-    pub doctor_roll: Option<i32>,      // FK, NULL байж болно
+    pub doctor_roll: i32,              // FK, NULL байж болно
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub is_active: bool,
@@ -56,7 +57,6 @@ pub struct ItemRow {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
-
 pub async fn insert_doctor_user(
     db: &Db,
     reg_no: &str,
@@ -65,11 +65,11 @@ pub async fn insert_doctor_user(
     password_hash: &str,
     rank_name: Option<&str>,
     org_name: Option<&str>,
-    org_id: Option<Uuid>,
+    org_id: i32, // int, NOT NULL
     position: Option<&str>,
     birth_date: Option<NaiveDate>,
     gender: Option<&str>,
-    doctor_roll: Option<i32>,
+    doctor_roll: i32, // int, NOT NULL
 ) -> Result<DoctorUserRow, DbError> {
     let row = sqlx::query_as!(
         DoctorUserRow,
@@ -80,9 +80,22 @@ pub async fn insert_doctor_user(
         )
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
         RETURNING 
-            id, reg_no, first_name, last_name, password_hash,
-            rank_name, org_name, org_id, position, birth_date, gender, doctor_roll,
-            created_at, updated_at, is_active
+            id,
+            doctor_id,
+            reg_no,
+            first_name,
+            last_name,
+            rank_name,
+            org_name,
+            org_id,
+            position,
+            birth_date,
+            gender,
+            password_hash,
+            doctor_roll,
+            created_at,
+            updated_at,
+            is_active
         "#,
         reg_no,
         first_name,
@@ -90,11 +103,11 @@ pub async fn insert_doctor_user(
         password_hash,
         rank_name,
         org_name,
-        org_id,
+        org_id, // ⚡ одоо int
         position,
         birth_date,
         gender,
-        doctor_roll
+        doctor_roll // ⚡ одоо int
     )
     .fetch_one(&db.0)
     .await?;
@@ -109,8 +122,41 @@ pub async fn find_doctor_by_reg_no(
     let row = sqlx::query_as!(
         DoctorUserRow,
         r#"
-        SELECT 
+        SELECT
+        id,
+        doctor_id,
+            reg_no,
+            first_name,
+            last_name,
+            password_hash,
+            rank_name,
+            org_name,
+            org_id,
+            position,
+            birth_date,
+            gender,
+            doctor_roll,
+            created_at,
+            updated_at,
+            is_active
+        FROM doctor_user
+        WHERE reg_no = $1
+        "#,
+        reg_no
+    )
+    .fetch_optional(&db.0)
+    .await?;
+
+    Ok(row)
+}
+
+pub async fn find_doctor_by_id(db: &Db, id: Uuid) -> Result<Option<DoctorUserRow>, DbError> {
+    let row = sqlx::query_as!(
+        DoctorUserRow,
+        r#"
+        SELECT
             id,
+            doctor_id,
             reg_no,
             first_name,
             last_name,
@@ -126,9 +172,9 @@ pub async fn find_doctor_by_reg_no(
             updated_at,
             is_active
         FROM doctor_user
-        WHERE reg_no = $1
+        WHERE id = $1
         "#,
-        reg_no
+        id
     )
     .fetch_optional(&db.0)
     .await?;

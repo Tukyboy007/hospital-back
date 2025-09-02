@@ -5,7 +5,7 @@ use uuid::Uuid;
 #[derive(Debug, Clone)]
 pub struct AuthUser {
     pub user_id: Uuid,
-    pub role: String,
+    pub role: i32,
 }
 
 impl FromRequest for AuthUser {
@@ -20,9 +20,13 @@ impl FromRequest for AuthUser {
     }
 }
 
-pub fn require_role(req: &actix_web::HttpRequest, role: &str) -> Result<(), actix_web::Error> {
+pub fn require_role(
+    req: &actix_web::HttpRequest,
+    required_role: i32, // эндээс шууд required_role гээд хэрэглэнэ
+) -> Result<(), actix_web::Error> {
     if let Some(user) = req.extensions().get::<AuthUser>() {
-        if user.role == role || user.role == "Admin" {
+        if user.role == required_role || user.role == 1 {
+            // 1 = admin (doctor_rolls.roll_id)
             return Ok(());
         }
     }

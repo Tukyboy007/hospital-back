@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT \n            id,\n            reg_no,\n            first_name,\n            last_name,\n            rank_name,\n            org_name,\n            org_id,\n            position,\n            birth_date,\n            gender,\n            doctor_roll,\n            password_hash,\n            created_at,\n            updated_at,\n            is_active\n        FROM doctor_user\n        WHERE reg_no = $1\n        ",
+  "query": "\n        INSERT INTO doctor_user (\n            reg_no, first_name, last_name, password_hash,\n            rank_name, org_name, org_id, position, birth_date, gender, doctor_roll\n        )\n        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)\n        RETURNING \n            id,\n            doctor_id,\n            reg_no,\n            first_name,\n            last_name,\n            rank_name,\n            org_name,\n            org_id,\n            position,\n            birth_date,\n            gender,\n            password_hash,\n            doctor_roll,\n            created_at,\n            updated_at,\n            is_active\n        ",
   "describe": {
     "columns": [
       {
@@ -10,53 +10,53 @@
       },
       {
         "ordinal": 1,
+        "name": "doctor_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
         "name": "reg_no",
         "type_info": "Text"
       },
       {
-        "ordinal": 2,
+        "ordinal": 3,
         "name": "first_name",
         "type_info": "Text"
       },
       {
-        "ordinal": 3,
+        "ordinal": 4,
         "name": "last_name",
         "type_info": "Text"
       },
       {
-        "ordinal": 4,
+        "ordinal": 5,
         "name": "rank_name",
         "type_info": "Text"
       },
       {
-        "ordinal": 5,
+        "ordinal": 6,
         "name": "org_name",
         "type_info": "Text"
       },
       {
-        "ordinal": 6,
+        "ordinal": 7,
         "name": "org_id",
-        "type_info": "Uuid"
+        "type_info": "Int4"
       },
       {
-        "ordinal": 7,
+        "ordinal": 8,
         "name": "position",
         "type_info": "Text"
       },
       {
-        "ordinal": 8,
+        "ordinal": 9,
         "name": "birth_date",
         "type_info": "Date"
       },
       {
-        "ordinal": 9,
+        "ordinal": 10,
         "name": "gender",
         "type_info": "Text"
-      },
-      {
-        "ordinal": 10,
-        "name": "doctor_roll",
-        "type_info": "Int4"
       },
       {
         "ordinal": 11,
@@ -65,42 +65,58 @@
       },
       {
         "ordinal": 12,
+        "name": "doctor_roll",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 13,
         "name": "created_at",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 13,
+        "ordinal": 14,
         "name": "updated_at",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 14,
+        "ordinal": 15,
         "name": "is_active",
         "type_info": "Bool"
       }
     ],
     "parameters": {
       "Left": [
-        "Text"
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Int4",
+        "Text",
+        "Date",
+        "Text",
+        "Int4"
       ]
     },
     "nullable": [
       false,
       false,
+      false,
       true,
       true,
       true,
       true,
+      false,
       true,
       true,
       true,
-      true,
-      true,
+      false,
       false,
       false,
       false,
       false
     ]
   },
-  "hash": "bde337b9895eea8f1c9b547dc0a65b11f50331c11f4f3dd6adb9fa0a58fff783"
+  "hash": "5f1297a57f056d7f38c0437b4223eb17d91654493133b87ac4cab04f8e6530a4"
 }

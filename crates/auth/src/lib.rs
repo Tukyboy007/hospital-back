@@ -3,6 +3,7 @@ use argon2::PasswordHasher;
 use argon2::password_hash::{Error as PasswordHashError, SaltString};
 use base64::Engine;
 use chrono::Utc;
+use jsonwebtoken;
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use rand::RngCore;
 use rand::thread_rng;
@@ -22,15 +23,36 @@ impl JwtKeys {
             dec: DecodingKey::from_secret(secret.as_bytes()),
         }
     }
+
+    pub fn encode_access(&self, claims: &Claims) -> Result<String, jsonwebtoken::errors::Error> {
+        let token = jsonwebtoken::encode(&Header::default(), claims, &self.enc)?;
+        Ok(token)
+    }
+
+    pub fn encode_refresh(&self, claims: &Claims) -> Result<String, jsonwebtoken::errors::Error> {
+        let mut header = Header::default();
+        header.kid = Some(claims.jti.clone());
+        let token = jsonwebtoken::encode(&header, claims, &self.enc)?;
+        Ok(token)
+    }
+
+    pub fn decode(&self, token: &str) -> Result<Claims, jsonwebtoken::errors::Error> {
+        let data =
+            jsonwebtoken::decode::<Claims>(token, &self.dec, &jsonwebtoken::Validation::default())?;
+        Ok(data.claims)
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Claims {
-    pub sub: Uuid,
-    pub role: String,
-    pub iat: i64,
-    pub exp: i64,
-    pub jti: String, // unique id to tie refresh tokens to DB records
+    pub sub: Uuid,           // doctor_user.id (UUID)
+    pub doctor_id: i64,      // BIGSERIAL doctor_id
+    pub reg_no: String,      // эмчийн бүртгэлийн дугаар
+    pub role: i32,           // doctor_roll (int), Option<i32>
+    pub created_org_id: i32, // байгууллагын ID
+    pub iat: i64,            // issued at
+    pub exp: i64,            // expiry
+    pub jti: String,         // unique token id
 }
 
 #[derive(thiserror::Error, Debug)]
@@ -48,43 +70,56 @@ pub fn new_jti() -> String {
     thread_rng().fill_bytes(&mut bytes);
     base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(bytes)
 }
-
 pub fn sign_access(
     keys: &JwtKeys,
     user_id: Uuid,
-    role: &str,
-    ttl_secs: i64,
-) -> Result<String, AuthError> {
-    let iat = now_ts();
-    let exp = iat + ttl_secs;
+    doctor_id: i64,
+    reg_no: &str,
+    role: i32,
+    created_org_id: i32,
+    ttl: i64,
+) -> Result<String, jsonwebtoken::errors::Error> {
+    let now = now_ts();
     let claims = Claims {
         sub: user_id,
-        role: role.into(),
-        iat,
-        exp,
+        doctor_id,
+        reg_no: reg_no.to_string(),
+        role,
+        created_org_id,
+        iat: now,
+        exp: now + ttl,
         jti: new_jti(),
     };
-    jsonwebtoken::encode(&Header::new(Algorithm::HS256), &claims, &keys.enc)
-        .map_err(|_| AuthError::InvalidToken)
+
+    // энд `keys.enc` ашиглана (access биш!)
+    jsonwebtoken::encode(&Header::default(), &claims, &keys.enc)
 }
 
 pub fn sign_refresh(
     keys: &JwtKeys,
     user_id: Uuid,
-    role: &str,
-    ttl_secs: i64,
-) -> Result<(String, Claims), AuthError> {
-    let iat = now_ts();
-    let exp = iat + ttl_secs;
+    doctor_id: i64,
+    created_org_id: i32,
+    reg_no: &str,
+    role: i32,
+    ttl: i64,
+) -> Result<(String, Claims), jsonwebtoken::errors::Error> {
+    let now = now_ts();
     let claims = Claims {
         sub: user_id,
-        role: role.into(),
-        iat,
-        exp,
+        doctor_id,
+        reg_no: reg_no.to_string(),
+        role,
+        created_org_id, // refresh дээр org_id хадгалахгүй
+        iat: now,
+        exp: now + ttl,
         jti: new_jti(),
     };
-    let token = jsonwebtoken::encode(&Header::new(Algorithm::HS256), &claims, &keys.enc)
-        .map_err(|_| AuthError::InvalidToken)?;
+
+    let mut header = Header::default();
+    header.kid = Some(claims.jti.clone());
+
+    let token = jsonwebtoken::encode(&header, &claims, &keys.enc)?;
     Ok((token, claims))
 }
 

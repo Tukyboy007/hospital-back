@@ -19,11 +19,11 @@ pub struct RegisterInput {
 
     pub rank_name: Option<String>,
     pub org_name: Option<String>,
-    pub org_id: Option<Uuid>,
+    pub org_id: i32,
     pub position: Option<String>,
     pub birth_date: Option<NaiveDate>,
     pub gender: Option<String>,
-    pub doctor_roll: Option<i32>,
+    pub doctor_roll: i32,
 }
 
 #[derive(Debug, Deserialize, Validate)]
