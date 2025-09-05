@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE public.hospital_equipment SET is_active = true WHERE report_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "4b468986af1c571e59f3e2ef72c4ef9cf239ffbf8a547c903a1be913a6638eae"
+}

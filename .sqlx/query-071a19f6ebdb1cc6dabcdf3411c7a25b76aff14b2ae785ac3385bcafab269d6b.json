@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE public.hospital_equipment\n        SET is_active = false, updated_at = NOW()\n        WHERE report_id = $1\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "071a19f6ebdb1cc6dabcdf3411c7a25b76aff14b2ae785ac3385bcafab269d6b"
+}
