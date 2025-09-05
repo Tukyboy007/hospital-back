@@ -1,9 +1,10 @@
-use crate::error::HttpApiError;
-use actix_web::{HttpRequest, HttpResponse, post, web};
-use auth::{hash_password, sha256_hex, verify_password};
+use crate::{error::HttpApiError, extractors::AuthUser, schemas::PasswordResetDefault};
+use actix_web::{HttpRequest, HttpResponse, Responder, post, put, web};
+use auth::{hash_password, verify_password};
 use chrono::{Duration, Utc};
 use db::{
-    find_doctor_by_reg_no, get_refresh_by_jti, insert_doctor_user, insert_refresh, revoke_refresh,
+    find_doctor_by_reg_no, get_refresh_by_jti, insert_doctor_user, insert_refresh,
+    reset_doctor_password, revoke_refresh,
 };
 use serde_json::json;
 use validator::Validate;
@@ -225,6 +226,7 @@ pub async fn login(
 
     Ok(resp)
 }
+
 #[post("/auth/refresh")]
 pub async fn refresh(
     req: HttpRequest,
@@ -376,4 +378,56 @@ pub async fn logout(
     )
     .ok();
     Ok(resp)
+}
+
+#[post("/auth/reset-password")]
+async fn reset_password(
+    req: HttpRequest,
+    state: web::Data<AppState>,
+    auth_user: AuthUser,
+    payload: web::Json<PasswordResetDefault>,
+) -> Result<impl Responder, HttpApiError> {
+    // зөвхөн админ эрхтэй хэрэглэгч
+    if auth_user.role != 1 {
+        return Ok(HttpResponse::Forbidden().body("Та энэ үйлдлийг хийх эрхгүй байна"));
+    }
+
+    // ✅ Access token cookie шалгах
+    let cookie_access = req.cookie("access_token").map(|c| c.value().to_string());
+    if cookie_access.is_none() {
+        return Ok(HttpResponse::Unauthorized().body("Access token cookie байхгүй байна"));
+    }
+
+    // Authorization header-ээс access_token авах
+    let header_access = req
+        .headers()
+        .get("Authorization")
+        .and_then(|v| v.to_str().ok())
+        .and_then(|s| s.strip_prefix("Bearer "))
+        .map(|s| s.to_string());
+
+    if header_access.is_none() {
+        return Ok(HttpResponse::Unauthorized().body("Authorization header байхгүй байна"));
+    }
+
+    // Хоёрыг тааруулах
+    if cookie_access != header_access {
+        return Ok(HttpResponse::Unauthorized().body("Access token таарахгүй байна"));
+    }
+
+    // ✅ CSRF хамгаалалт: Header vs Cookie
+    let header_csrf = req
+        .headers()
+        .get("X-CSRF-Token")
+        .and_then(|v| v.to_str().ok());
+    let cookie_csrf = req.cookie("csrf_token").map(|c| c.value().to_string());
+
+    if header_csrf.is_none() || cookie_csrf.is_none() || header_csrf != cookie_csrf.as_deref() {
+        return Ok(HttpResponse::Unauthorized().body("CSRF token буруу эсвэл байхгүй байна"));
+    }
+
+    // Default password болгон reset хийх
+    reset_doctor_password(&state.db, &payload.reg_no).await?;
+
+    Ok(HttpResponse::Ok().body("Нууц үг default-ээр (123456789) шинэчлэгдлээ"))
 }

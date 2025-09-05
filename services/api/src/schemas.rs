@@ -1,6 +1,5 @@
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 use validator::Validate;
 
 #[derive(Debug, Deserialize, Validate)]
@@ -34,15 +33,43 @@ pub struct LoginInput {
     pub password: String,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct PasswordResetDefault {
+    pub reg_no: String,
+}
+
 #[derive(Debug, Serialize)]
 pub struct TokenPair {
     pub access_token: String,
 }
 
 #[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct ItemIn {
-    pub title: String,
-    #[serde(alias = "description")]
-    pub description: Option<String>,
+pub struct DiseaseInput {
+    pub code_name: String,
+    pub text_name: Option<String>,
+    pub disease_section: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct DiseaseUpdate {
+    pub code_name: String,
+    pub text_name: Option<String>,
+    pub disease_section: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct EquipmentReportInput {
+    pub report_id: i64, // заавал ирнэ (equipment-ийн report_id)
+    pub issue_description: Option<String>,
+    pub reason: Option<String>,
+    pub broken_date: Option<NaiveDate>,
+    pub fixed_date: Option<NaiveDate>,
+    pub status: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct FixedReportInput {
+    pub report_id: i64,
+    pub reason: String,
+    pub fixed_date: NaiveDate,
 }

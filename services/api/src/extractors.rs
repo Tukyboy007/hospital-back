@@ -1,3 +1,5 @@
+use crate::error::HttpApiError;
+use actix_web::HttpRequest;
 use actix_web::{FromRequest, HttpMessage};
 use std::future::{Ready, ready};
 use uuid::Uuid;
@@ -6,6 +8,8 @@ use uuid::Uuid;
 pub struct AuthUser {
     pub user_id: Uuid,
     pub role: i32,
+    pub org_id: i32,
+    pub doctor_id: i64,
 }
 
 impl FromRequest for AuthUser {
@@ -20,15 +24,13 @@ impl FromRequest for AuthUser {
     }
 }
 
-pub fn require_role(
-    req: &actix_web::HttpRequest,
-    required_role: i32, // эндээс шууд required_role гээд хэрэглэнэ
-) -> Result<(), actix_web::Error> {
+pub fn require_role(req: &HttpRequest, required_role: i32) -> Result<(), HttpApiError> {
     if let Some(user) = req.extensions().get::<AuthUser>() {
         if user.role == required_role || user.role == 1 {
-            // 1 = admin (doctor_rolls.roll_id)
             return Ok(());
+        } else {
+            return Err(HttpApiError::Auth);
         }
     }
-    Err(actix_web::error::ErrorForbidden("forbidden"))
+    Err(HttpApiError::Auth)
 }

@@ -1,0 +1,116 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n    INSERT INTO public.hospital_equipment\n        (fixed_id, name, count, created_date, each_price, serial_no, purchase_date,\n         equipment_type_id, org_id, is_active, created_doc_id)\n    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)\n    RETURNING \n        id, fixed_id, name, count, created_date, each_price, serial_no, purchase_date,\n        equipment_type_id, org_id, report_id, is_active, created_doc_id,\n        created_at, updated_at\n    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "fixed_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "count",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "created_date",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "each_price",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 6,
+        "name": "serial_no",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "purchase_date",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 8,
+        "name": "equipment_type_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 9,
+        "name": "org_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 10,
+        "name": "report_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 11,
+        "name": "is_active",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 12,
+        "name": "created_doc_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 13,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 14,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Text",
+        "Int4",
+        "Timestamptz",
+        "Numeric",
+        "Text",
+        "Date",
+        "Int4",
+        "Int4",
+        "Bool",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "a4dd05f64d4229cf6d881ede57f9d49d55cce64805aa2d099c55af8eb4977fd7"
+}

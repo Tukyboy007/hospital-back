@@ -1,28 +1,45 @@
 use actix_web::{HttpResponse, ResponseError};
 use common::AppError;
+use db::DbError;
+use std::fmt;
 use thiserror::Error;
-
-#[derive(Debug, Error)]
+#[derive(Debug, thiserror::Error)]
 pub enum HttpApiError {
     #[error("{0}")]
     App(#[from] AppError),
-    #[error("db error")]
-    Db(#[from] db::DbError),
+
+    #[error("{0}")]
+    Db(#[from] DbError),
+
     #[error("auth error")]
     Auth,
 }
 
-impl ResponseError for HttpApiError {
+impl actix_web::ResponseError for HttpApiError {
     fn error_response(&self) -> HttpResponse {
         match self {
-            Self::App(AppError::NotFound) => HttpResponse::NotFound().finish(),
-            Self::App(AppError::Conflict) => HttpResponse::Conflict().finish(),
-            Self::App(AppError::Unauthorized) => HttpResponse::Unauthorized().finish(),
-            Self::App(AppError::Forbidden) => HttpResponse::Forbidden().finish(),
-            Self::App(AppError::BadRequest(msg)) => {
-                HttpResponse::BadRequest().json(serde_json::json!({"error":msg}))
+            HttpApiError::Db(DbError::Constraint(msg)) => {
+                HttpResponse::BadRequest().json(serde_json::json!({
+                    "error": "constraint_violation",
+                    "message": msg
+                }))
             }
-            _ => HttpResponse::InternalServerError().finish(),
+            HttpApiError::Db(DbError::NotFound) => {
+                HttpResponse::NotFound().json(serde_json::json!({
+                    "error": "not_found",
+                    "message": "Record not found"
+                }))
+            }
+            HttpApiError::Db(DbError::Forbidden) => {
+                HttpResponse::Forbidden().json(serde_json::json!({
+                    "error": "forbidden",
+                    "message": "You do not have permission"
+                }))
+            }
+            other => HttpResponse::InternalServerError().json(serde_json::json!({
+                "error": "internal_error",
+                "message": other.to_string()
+            })),
         }
     }
 }

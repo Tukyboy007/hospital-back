@@ -5,6 +5,7 @@ use actix_web::dev::Service;
 use actix_web::{App, HttpResponse, HttpServer, middleware::Logger, web};
 use tracing_subscriber::EnvFilter;
 
+mod auth_guard;
 mod error;
 mod extractors;
 mod middleware;
@@ -54,11 +55,16 @@ async fn main() -> std::io::Result<()> {
             .service(routes::auth::login)
             .service(routes::auth::refresh)
             .service(routes::auth::logout)
-            .service(routes::items::list)
-            .service(routes::items::get)
-            .service(routes::items::create)
-            .service(routes::items::update)
-            .service(routes::items::remove)
+            .service(routes::auth::reset_password)
+            .service(routes::desease::create)
+            .service(routes::desease::list)
+            .service(routes::desease::update)
+            .service(routes::desease::remove)
+            .service(routes::equipment::create)
+            .service(routes::equipment::list_equipment)
+            .service(routes::equipment::create_report)
+            .service(routes::equipment::list_reports)
+            .service(routes::equipment::fix_report)
             .default_service(web::to(|| async { HttpResponse::NotFound().finish() }))
             .wrap_fn(|req, srv| {
                 // JWT auth extractor: read Bearer or cookie, set AuthUser ext if valid
@@ -86,6 +92,8 @@ async fn main() -> std::io::Result<()> {
                             .insert(crate::extractors::AuthUser {
                                 user_id: claims.sub,
                                 role: claims.role,
+                                org_id: claims.created_org_id,
+                                doctor_id: claims.doctor_id,
                             });
                     }
                 }

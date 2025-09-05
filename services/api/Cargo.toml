@@ -28,4 +28,4 @@ hex = "0.4"
 cookie = { version = "0.18.1", features = ["secure", "percent-encode"] }
 futures-util = "0.3.31"
 sha1_smol = "1.0.1"
-
+bigdecimal = "0.4"

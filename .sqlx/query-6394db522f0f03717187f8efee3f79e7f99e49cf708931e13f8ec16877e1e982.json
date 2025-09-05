@@ -1,0 +1,89 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO public.equipment_reports\n            (report_id, issue_description, reason, broken_date, fixed_date, status, created_org_id, created_doctor_id)\n        VALUES ($1,$2,$3,$4,$5,$6,$7,$8)\n        RETURNING \n            id, report_id, issue_description, reason, broken_date, fixed_date, status,\n            created_org_id, created_doctor_id, created_at, updated_at\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "report_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "issue_description",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "reason",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "broken_date",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 5,
+        "name": "fixed_date",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 6,
+        "name": "status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "created_org_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 8,
+        "name": "created_doctor_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 9,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Text",
+        "Text",
+        "Date",
+        "Date",
+        "Text",
+        "Int4",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "6394db522f0f03717187f8efee3f79e7f99e49cf708931e13f8ec16877e1e982"
+}
