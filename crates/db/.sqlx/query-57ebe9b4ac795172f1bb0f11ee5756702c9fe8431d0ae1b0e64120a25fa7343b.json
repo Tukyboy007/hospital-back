@@ -1,0 +1,122 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO doctor_user (\n            reg_no, first_name, last_name, rank_name, org_name, org_id,\n            position, birth_date, gender, doctor_roll, password_hash, is_active\n        )\n        VALUES (\n            $1,$2,$3,$4,$5,$6,\n            $7,$8,$9,$10,$11,TRUE\n        )\n        RETURNING \n            id, doctor_id, rank_name, first_name, last_name, org_name,\n            org_id, reg_no, position, birth_date, gender,\n            doctor_roll, created_at, updated_at, password_hash, is_active\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "doctor_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "rank_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "first_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "last_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "org_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "org_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
+        "name": "reg_no",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "position",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "birth_date",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 10,
+        "name": "gender",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
+        "name": "doctor_roll",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 12,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 13,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 14,
+        "name": "password_hash",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 15,
+        "name": "is_active",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Int4",
+        "Text",
+        "Date",
+        "Text",
+        "Int4",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "57ebe9b4ac795172f1bb0f11ee5756702c9fe8431d0ae1b0e64120a25fa7343b"
+}

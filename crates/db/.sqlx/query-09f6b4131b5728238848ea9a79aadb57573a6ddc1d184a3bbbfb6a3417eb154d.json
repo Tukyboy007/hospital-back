@@ -1,0 +1,112 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT * FROM doctor_user WHERE reg_no = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "doctor_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "rank_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "first_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "last_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "org_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "org_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
+        "name": "reg_no",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "position",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "birth_date",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 10,
+        "name": "gender",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
+        "name": "doctor_roll",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 12,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 13,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 14,
+        "name": "password_hash",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 15,
+        "name": "is_active",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "09f6b4131b5728238848ea9a79aadb57573a6ddc1d184a3bbbfb6a3417eb154d"
+}
